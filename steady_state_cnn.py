@@ -35,7 +35,7 @@ with tf.Session() as sess:
   coord = tf.train.Coordinator()
   threads = tf.train.start_queue_runners(coord=coord)
 
-  for i in tqdm(range(3000)):
+  for i in tqdm(range(2440)):
     example, l = sess.run([boundary, sflow])
     l = l[:, :, 0]**2 + l[:, :, 1]**2
     l = np.reshape(l, (1, 128, 256))
@@ -48,6 +48,9 @@ with tf.Session() as sess:
     #print (example.shape,l.shape)
   coord.request_stop()
   coord.join(threads)
+
+train_x = np.reshape(train_x, (2440, 128, 256, 1))
+train_y = np.reshape(train_y, (2440, 128, 256, 1))
 
 # Parameters
 params
