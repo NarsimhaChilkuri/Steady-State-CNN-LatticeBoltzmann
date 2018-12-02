@@ -8,6 +8,10 @@ Generating the dataset using traditional CFD methods is quite expensive, computa
 
 Traning on 2440 images and testing on the rest reults in an R2 score of 0.9. 
 
-![cnn_result](Images/__results___3_1.png)
+Prediction             |  True
+:-------------------------:|:-------------------------:
+![cnn_result](Images/__results___3_1.png)  |  ![cnn_result](Images/__results___4_1.png)
+![cnn_result](Images/__results___3_2.png) | ![cnn_result](Images/__results___4_2.png)
 
-![cnn_result](Images/__results___4_1.png)
+
+
