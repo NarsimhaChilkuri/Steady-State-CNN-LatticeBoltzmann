@@ -53,7 +53,6 @@ train_x = np.reshape(train_x, (2440, 128, 256, 1))
 train_y = np.reshape(train_y, (2440, 128, 256, 1))
 
 # Parameters
-params
 batch_size = 16
 epochs = 20 # number of times through training set
 
@@ -70,7 +69,7 @@ conv7 = Conv2DTranspose(1, (2, 2), strides=(2, 2), activation='relu', padding='v
 
 model = Model(inputs=[inputs], outputs=[conv7])
 model.summary()
-# compile the model with loss and optimizer
+
 model.compile(loss=keras.losses.mean_squared_error,
             optimizer=keras.optimizers.Adam(lr=1e-4),
             metrics=['MSE'])
