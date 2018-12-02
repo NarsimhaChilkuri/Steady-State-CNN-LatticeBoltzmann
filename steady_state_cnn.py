@@ -1,9 +1,14 @@
 import os
 import numpy as np
-import tensorflow as tf
-from glob import glob as glb
+import matplotlib.pyplot as plt
 from tqdm import tqdm_notebook as tqdm
+import tensorflow as tf
+import keras
+from keras.models import Model
+from keras.layers import Input, concatenate, Conv2D, Dense, MaxPooling2D, Flatten, Conv2DTranspose
+from keras.layers.convolutional import ZeroPadding2D
 
+# Input Data
 def read_and_decode(filename_queue, shape):
   reader = tf.TFRecordReader()
   key, serialized_example = reader.read(filename_queue)
@@ -44,42 +49,30 @@ with tf.Session() as sess:
   coord.request_stop()
   coord.join(threads)
 
-  import keras
-  from keras.models import Model
-  from keras.layers import Input, concatenate, Conv2D, Dense, MaxPooling2D, Flatten, Conv2DTranspose
-  from keras.layers.convolutional import ZeroPadding2D
-  from keras import backend as K
+# Parameters
+params
+batch_size = 16
+epochs = 20 # number of times through training set
 
-  # numpy and matplot lib
-  import numpy as np
-  import matplotlib.pyplot as plt
+# Model based on the one given in the paper
+inputs = Input(train_x.shape[1:])
+conv1 = Conv2D(128, (8, 16), strides=(8, 16), activation='relu')(inputs)
+conv2 = Conv2D(512, (4, 4), strides=(4, 4), activation='relu', padding='valid')(conv1)
+conv3 = Conv2D(1024, (4, 4), activation='relu', padding='valid')(conv2)
+conv4 = Conv2DTranspose(512, (8, 8), strides=(8, 8), activation='relu', padding='valid')(conv3)
+conv5 = Conv2DTranspose(256, (4, 8), strides=(4, 8), activation='relu', padding='valid')(conv4)
+conv6 = Conv2DTranspose(32, (2, 2),  strides=(2, 2), activation='relu', padding='valid')(conv5)
+conv7 = Conv2DTranspose(1, (2, 2), strides=(2, 2), activation='relu', padding='valid')(conv6)
 
-  # training params
-  batch_size = 16
-  epochs = 20 # number of times through training set
 
+model = Model(inputs=[inputs], outputs=[conv7])
+model.summary()
+# compile the model with loss and optimizer
+model.compile(loss=keras.losses.mean_squared_error,
+            optimizer=keras.optimizers.Adam(lr=1e-4),
+            metrics=['MSE'])
 
-
-  # construct model
-  inputs = Input(train_x.shape[1:])
-  conv1 = Conv2D(128, (8, 16), strides=(8, 16), activation='relu')(inputs)
-  conv1 = Conv2D(512, (4, 4), strides=(4, 4), activation='relu', padding='valid')(conv1)
-  dense = Conv2D(1024, (4, 4), activation='relu', padding='valid')(conv1)
-  conv2 = Conv2DTranspose(512, (8, 8), strides=(8, 8), activation='relu', padding='valid')(dense)
-  conv2 = Conv2DTranspose(256, (4, 8), strides=(4, 8), activation='relu', padding='valid')(conv2)
-  conv5 = Conv2DTranspose(32, (2, 2),  strides=(2, 2), activation='relu', padding='valid')(conv2)
-  conv5 = Conv2DTranspose(1, (2, 2), strides=(2, 2), activation='relu', padding='valid')(conv5)
-
-  # construct model
-  model = Model(inputs=[inputs], outputs=[conv5])
-  model.summary()
-  # compile the model with loss and optimizer
-  model.compile(loss=keras.losses.mean_squared_error,
-                optimizer=keras.optimizers.Adam(lr=1e-4),
-                metrics=['MSE'])
-
-  # train model
-  model.fit(train_x, train_y,
-            batch_size=batch_size,
-            epochs=epochs,
-            verbose=1)
+model.fit(train_x, train_y,
+        batch_size=batch_size,
+        epochs=epochs,
+        verbose=1)
